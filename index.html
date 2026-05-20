@@ -1,9 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-<!--
-  Curator lock: all visitors see the palette for this IANA timezone.
-  Change LOCKED_TIMEZONE below (e.g. Europe/London, America/New_York).
--->
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -244,6 +240,10 @@
       margin: 0;
     }
 
+    .placard .meta + .meta {
+      margin-top: 0.2rem;
+    }
+
     .placard a {
       color: var(--accent);
       text-decoration: none;
@@ -285,6 +285,39 @@
     }
 
     footer a:hover { color: var(--accent); }
+
+    .timezone-control {
+      display: inline-flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      gap: 0.65rem;
+      margin: 0.35rem 0 0;
+    }
+
+    #timezone-toggle {
+      font: inherit;
+      font-size: 0.6rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      background: transparent;
+      border: 1px solid rgba(196, 181, 154, 0.35);
+      padding: 0.3rem 0.55rem;
+      cursor: pointer;
+      transition: color 0.2s, border-color 0.2s, background 0.2s;
+    }
+
+    #timezone-toggle:hover {
+      color: var(--text);
+      border-color: var(--accent-dim);
+      background: rgba(196, 181, 154, 0.08);
+    }
+
+    #timezone-toggle[aria-pressed="true"] {
+      color: var(--accent);
+      border-color: rgba(196, 181, 154, 0.5);
+    }
 
     /* Portrait: stack works vertically, compact header */
     body.portrait header {
@@ -343,6 +376,7 @@
 
     @media (prefers-reduced-motion: reduce) {
       .placard a { transition: none; }
+      #timezone-toggle { transition: none; }
     }
   </style>
 </head>
@@ -378,14 +412,17 @@
         <div class="placard">
           <h2>CONTINGENT #94</h2>
           <p class="meta">Token 95 · <a href="https://objkt.com/tokens/KT1UAS5N32uiAeQjXjfwkkwh7NUHPQapzLNs/95" target="_blank" rel="noopener">View on OBJKT</a></p>
+          <p class="meta"><a class="ipfs-link" data-token-hash="SNwLkwc34iAxtJ2DQozttCypjy4AF7kye" target="_blank" rel="noopener">Open IPFS asset</a></p>
         </div>
         <div class="placard">
           <h2>CONTINGENT #83</h2>
           <p class="meta">Token 84 · <a href="https://objkt.com/tokens/KT1UAS5N32uiAeQjXjfwkkwh7NUHPQapzLNs/84" target="_blank" rel="noopener">View on OBJKT</a></p>
+          <p class="meta"><a class="ipfs-link" data-token-hash="3eTwWM92SEmmiLNFEgVgus13VSHKWZJw2" target="_blank" rel="noopener">Open IPFS asset</a></p>
         </div>
         <div class="placard">
           <h2>CONTINGENT #143</h2>
           <p class="meta">Token 144 · <a href="https://objkt.com/tokens/KT1UAS5N32uiAeQjXjfwkkwh7NUHPQapzLNs/144" target="_blank" rel="noopener">View on OBJKT</a></p>
+          <p class="meta"><a class="ipfs-link" data-token-hash="CbfUEHV9hHYvZTXDdnCsh4HYQbyGQC8bN" target="_blank" rel="noopener">Open IPFS asset</a></p>
         </div>
       </div>
     </main>
@@ -399,29 +436,59 @@
       <a href="https://objkt.com/collections/KT1UAS5N32uiAeQjXjfwkkwh7NUHPQapzLNs" target="_blank" rel="noopener">CONTINGENT</a>
       · KT1UAS5N32uiAeQjXjfwkkwh7NUHPQapzLNs
     </p>
-    <p>Reference timezone · <span id="timezone-lock">Asia/Macau</span></p>
+    <p class="timezone-control">
+      <span id="timezone-note">Palette locked to reference timezone · <span id="timezone-lock">Asia/Macau</span></span>
+      <button type="button" id="timezone-toggle" aria-pressed="true">Use local timezone</button>
+    </p>
   </footer>
 
   <script>
     const LOCKED_TIMEZONE = "Asia/Macau";
+    const TIMEZONE_LOCK_KEY = "contingent-timezone-lock";
     const ARTIFACT_CID = "bafybeiang4nlnz6t3yh4c52ffjbd3nqzjlns5bv333mom7kyzmti5hdmem";
     const GATEWAY = "https://ipfs.io/ipfs";
     const ART_ASPECT = 4 / 6;
 
+    let timezoneLockEnabled = localStorage.getItem(TIMEZONE_LOCK_KEY) !== "0";
+
     function artworkUrl(tokenHash) {
-      const params = new URLSearchParams({
-        tokenHash,
-        debugTimezone: LOCKED_TIMEZONE,
-        fullScreen: "1",
-      });
+      const params = new URLSearchParams({ tokenHash });
+      if (timezoneLockEnabled) params.set("debugTimezone", LOCKED_TIMEZONE);
       return `${GATEWAY}/${ARTIFACT_CID}/?${params.toString()}`;
     }
 
-    for (const frame of document.querySelectorAll("iframe[data-token-hash]")) {
-      frame.src = artworkUrl(frame.dataset.tokenHash);
+    function updateTimezoneUI() {
+      const note = document.getElementById("timezone-note");
+      const toggle = document.getElementById("timezone-toggle");
+
+      toggle.setAttribute("aria-pressed", String(timezoneLockEnabled));
+      toggle.textContent = timezoneLockEnabled ? "Use local timezone" : `Lock to ${LOCKED_TIMEZONE}`;
+
+      if (timezoneLockEnabled) {
+        note.innerHTML = `Palette locked to reference timezone · <span id="timezone-lock">${LOCKED_TIMEZONE}</span>`;
+      } else {
+        note.textContent = "Using viewer local timezone";
+      }
     }
 
-    document.getElementById("timezone-lock").textContent = LOCKED_TIMEZONE;
+    function applyArtworkUrls() {
+      for (const frame of document.querySelectorAll("iframe[data-token-hash]")) {
+        frame.src = artworkUrl(frame.dataset.tokenHash);
+      }
+      for (const link of document.querySelectorAll(".ipfs-link[data-token-hash]")) {
+        link.href = artworkUrl(link.dataset.tokenHash);
+      }
+    }
+
+    updateTimezoneUI();
+    applyArtworkUrls();
+
+    document.getElementById("timezone-toggle").addEventListener("click", () => {
+      timezoneLockEnabled = !timezoneLockEnabled;
+      localStorage.setItem(TIMEZONE_LOCK_KEY, timezoneLockEnabled ? "1" : "0");
+      updateTimezoneUI();
+      applyArtworkUrls();
+    });
 
     function isPortraitLayout() {
       return window.matchMedia("(orientation: portrait)").matches;
