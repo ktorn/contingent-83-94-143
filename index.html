@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<!--
+  Curator lock: all visitors see the palette for this IANA timezone.
+  Change LOCKED_TIMEZONE below (e.g. Europe/London, America/New_York).
+-->
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CONTINGENT — Triptych</title>
+  <meta name="description" content="A museum presentation of three CONTINGENT generative artworks by James Bloom & Gottfried Jäger." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --wall: #141210;
+      --wall-mid: #1c1916;
+      --wall-light: #262220;
+      --plinth: #0e0c0a;
+      --frame: #3d3832;
+      --frame-highlight: #6b6358;
+      --accent: #c4b59a;
+      --accent-dim: #8a7f6e;
+      --text: #e8e2d8;
+      --text-muted: #9a9288;
+      --spot: rgba(255, 248, 235, 0.07);
+      --gutter: clamp(1rem, 2.5vw, 2.5rem);
+      --header-h: clamp(5.5rem, 14vh, 8rem);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      min-height: 100%;
+      background: var(--wall);
+      color: var(--text);
+      font-family: "DM Sans", system-ui, sans-serif;
+      font-weight: 300;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body {
+      display: flex;
+      flex-direction: column;
+      min-height: 100dvh;
+      overflow-x: auto;
+    }
+
+    /* Gallery architecture */
+    .gallery {
+      position: relative;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      background:
+        radial-gradient(ellipse 120% 80% at 50% -20%, var(--spot), transparent 55%),
+        linear-gradient(180deg, var(--wall-mid) 0%, var(--wall) 35%, var(--plinth) 100%);
+    }
+
+    .gallery::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background:
+        repeating-linear-gradient(
+          90deg,
+          transparent,
+          transparent calc(33.333% - 1px),
+          rgba(0, 0, 0, 0.35) calc(33.333% - 1px),
+          rgba(0, 0, 0, 0.35) 33.333%
+        );
+      opacity: 0.4;
+      z-index: 0;
+    }
+
+    header {
+      position: relative;
+      z-index: 2;
+      padding: var(--gutter) var(--gutter) 0;
+      text-align: center;
+      border-bottom: 1px solid rgba(196, 181, 154, 0.12);
+    }
+
+    .exhibition-label {
+      font-size: 0.65rem;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: var(--accent-dim);
+      margin: 0 0 0.6rem;
+    }
+
+    h1 {
+      font-family: "Cormorant Garamond", Georgia, serif;
+      font-weight: 500;
+      font-size: clamp(2rem, 5vw, 3.25rem);
+      letter-spacing: 0.08em;
+      margin: 0;
+      color: var(--text);
+    }
+
+    .subtitle {
+      font-family: "Cormorant Garamond", Georgia, serif;
+      font-style: italic;
+      font-size: clamp(1rem, 2.2vw, 1.25rem);
+      color: var(--text-muted);
+      margin: 0.5rem 0 0;
+    }
+
+    .artists {
+      font-size: 0.75rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent-dim);
+      margin: 1rem 0 0;
+    }
+
+    /* Triptych wall */
+    .triptych {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(280px, 1fr));
+      gap: 0;
+      padding: var(--gutter) 0;
+      align-items: start;
+      justify-items: center;
+    }
+
+    .panel {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+      padding: 0 calc(var(--gutter) * 0.6);
+      position: relative;
+    }
+
+    .panel::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 70%;
+      aspect-ratio: 4 / 6;
+      background: radial-gradient(ellipse at center, var(--spot) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .frame-wrap {
+      position: relative;
+      z-index: 1;
+      width: min(100%, calc((100dvh - var(--header-h) - 9rem) * 4 / 6));
+      aspect-ratio: 4 / 6;
+      background: var(--wall-light);
+      border: 1px solid var(--frame);
+      box-shadow:
+        inset 0 0 0 1px rgba(255, 255, 255, 0.04),
+        inset 0 1px 0 var(--frame-highlight),
+        0 24px 48px rgba(0, 0, 0, 0.45),
+        0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+
+    .frame-wrap::before {
+      content: "";
+      position: absolute;
+      inset: 6px;
+      border: 1px solid rgba(196, 181, 154, 0.15);
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    .artwork {
+      width: 100%;
+      height: 100%;
+      border: none;
+      background: transparent;
+      display: block;
+    }
+
+    .placard {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      margin-top: 1.25rem;
+      padding: 0 0.25rem 1.5rem;
+      text-align: center;
+    }
+
+    .placard h2 {
+      font-family: "Cormorant Garamond", Georgia, serif;
+      font-weight: 500;
+      font-size: 1.15rem;
+      letter-spacing: 0.04em;
+      margin: 0 0 0.35rem;
+      color: var(--text);
+    }
+
+    .placard .meta {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      letter-spacing: 0.06em;
+      margin: 0;
+    }
+
+    .placard a {
+      color: var(--accent);
+      text-decoration: none;
+      border-bottom: 1px solid rgba(196, 181, 154, 0.35);
+      transition: color 0.2s, border-color 0.2s;
+    }
+
+    .placard a:hover {
+      color: var(--text);
+      border-color: var(--text);
+    }
+
+    footer {
+      position: relative;
+      z-index: 2;
+      padding: 1.25rem var(--gutter) 1.75rem;
+      text-align: center;
+      font-size: 0.65rem;
+      letter-spacing: 0.1em;
+      color: var(--text-muted);
+      border-top: 1px solid rgba(196, 181, 154, 0.1);
+      background: var(--plinth);
+    }
+
+    footer a {
+      color: var(--accent-dim);
+      text-decoration: none;
+    }
+
+    footer a:hover { color: var(--accent); }
+
+    .floor-line {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--frame-highlight), transparent);
+      margin: 0 var(--gutter) 0;
+      opacity: 0.5;
+    }
+
+    @media (max-width: 900px) {
+      .triptych {
+        grid-template-columns: repeat(3, minmax(72vw, 1fr));
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        -webkit-overflow-scrolling: touch;
+      }
+      .panel { scroll-snap-align: center; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .placard a { transition: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="gallery">
+    <header>
+      <p class="exhibition-label">Generative Photography · Networked Edition</p>
+      <h1>CONTINGENT</h1>
+      <p class="subtitle">Triptych installation</p>
+      <p class="artists">James Bloom &amp; Gottfried Jäger</p>
+    </header>
+
+    <main class="triptych" aria-label="Three-panel artwork installation">
+      <article class="panel">
+        <div class="frame-wrap">
+          <iframe class="artwork" title="CONTINGENT #94" loading="eager" referrerpolicy="no-referrer" sandbox="allow-scripts allow-same-origin allow-downloads" data-token-hash="SNwLkwc34iAxtJ2DQozttCypjy4AF7kye"></iframe>
+        </div>
+        <div class="placard">
+          <h2>CONTINGENT #94</h2>
+          <p class="meta">Token 95 · <a href="https://objkt.com/tokens/KT1UAS5N32uiAeQjXjfwkkwh7NUHPQapzLNs/95" target="_blank" rel="noopener">View on OBJKT</a></p>
+        </div>
+      </article>
+
+      <article class="panel">
+        <div class="frame-wrap">
+          <iframe class="artwork" title="CONTINGENT #83" loading="eager" referrerpolicy="no-referrer" sandbox="allow-scripts allow-same-origin allow-downloads" data-token-hash="3eTwWM92SEmmiLNFEgVgus13VSHKWZJw2"></iframe>
+        </div>
+        <div class="placard">
+          <h2>CONTINGENT #83</h2>
+          <p class="meta">Token 84 · <a href="https://objkt.com/tokens/KT1UAS5N32uiAeQjXjfwkkwh7NUHPQapzLNs/84" target="_blank" rel="noopener">View on OBJKT</a></p>
+        </div>
+      </article>
+
+      <article class="panel">
+        <div class="frame-wrap">
+          <iframe class="artwork" title="CONTINGENT #143" loading="eager" referrerpolicy="no-referrer" sandbox="allow-scripts allow-same-origin allow-downloads" data-token-hash="CbfUEHV9hHYvZTXDdnCsh4HYQbyGQC8bN"></iframe>
+        </div>
+        <div class="placard">
+          <h2>CONTINGENT #143</h2>
+          <p class="meta">Token 144 · <a href="https://objkt.com/tokens/KT1UAS5N32uiAeQjXjfwkkwh7NUHPQapzLNs/144" target="_blank" rel="noopener">View on OBJKT</a></p>
+        </div>
+      </article>
+    </main>
+
+    <div class="floor-line" aria-hidden="true"></div>
+  </div>
+
+  <footer>
+    <p>
+      Collection
+      <a href="https://objkt.com/collections/KT1UAS5N32uiAeQjXjfwkkwh7NUHPQapzLNs" target="_blank" rel="noopener">CONTINGENT</a>
+      · KT1UAS5N32uiAeQjXjfwkkwh7NUHPQapzLNs
+    </p>
+    <p>Reference timezone · <span id="timezone-lock">Asia/Macau</span></p>
+  </footer>
+
+  <script>
+    const LOCKED_TIMEZONE = "Asia/Macau";
+    const ARTIFACT_CID = "bafybeiang4nlnz6t3yh4c52ffjbd3nqzjlns5bv333mom7kyzmti5hdmem";
+    const GATEWAY = "https://ipfs.io/ipfs";
+
+    function artworkUrl(tokenHash) {
+      const params = new URLSearchParams({
+        tokenHash,
+        debugTimezone: LOCKED_TIMEZONE,
+        fullScreen: "1",
+      });
+      return `${GATEWAY}/${ARTIFACT_CID}/?${params.toString()}`;
+    }
+
+    for (const frame of document.querySelectorAll("iframe[data-token-hash]")) {
+      frame.src = artworkUrl(frame.dataset.tokenHash);
+    }
+
+    const tzNote = document.getElementById("timezone-lock");
+    if (tzNote) tzNote.textContent = LOCKED_TIMEZONE;
+  </script>
+</body>
+</html>
