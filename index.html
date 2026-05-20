@@ -25,15 +25,22 @@
       --text: #e8e2d8;
       --text-muted: #9a9288;
       --spot: rgba(255, 248, 235, 0.07);
-      --gutter: clamp(1rem, 2.5vw, 2.5rem);
-      --header-h: clamp(5.5rem, 14vh, 8rem);
+      --gutter: clamp(0.75rem, 2.5vw, 2.5rem);
+      --art-aspect: 4 / 6;
+      --work-gap: clamp(0.35rem, 1.2vw, 1rem);
+      --frame-w: auto;
+      --frame-h: auto;
     }
 
     *, *::before, *::after { box-sizing: border-box; }
 
+    html {
+      overflow: hidden;
+      max-width: 100%;
+    }
+
     html, body {
       margin: 0;
-      min-height: 100%;
       background: var(--wall);
       color: var(--text);
       font-family: "DM Sans", system-ui, sans-serif;
@@ -44,22 +51,27 @@
     body {
       display: flex;
       flex-direction: column;
-      min-height: 100dvh;
-      overflow-x: auto;
+      width: 100%;
+      height: 100dvh;
+      max-width: 100%;
+      overflow: hidden;
     }
 
-    /* Gallery architecture */
     .gallery {
       position: relative;
       flex: 1;
       display: flex;
       flex-direction: column;
+      min-height: 0;
+      width: 100%;
+      max-width: 100%;
+      overflow: hidden;
       background:
         radial-gradient(ellipse 120% 80% at 50% -20%, var(--spot), transparent 55%),
         linear-gradient(180deg, var(--wall-mid) 0%, var(--wall) 35%, var(--plinth) 100%);
     }
 
-    .gallery::before {
+    body.landscape .gallery::before {
       content: "";
       position: fixed;
       inset: 0;
@@ -79,7 +91,9 @@
     header {
       position: relative;
       z-index: 2;
-      padding: var(--gutter) var(--gutter) 0;
+      flex-shrink: 0;
+      width: 100%;
+      padding: var(--gutter) var(--gutter) 0.75rem;
       text-align: center;
       border-bottom: 1px solid rgba(196, 181, 154, 0.12);
     }
@@ -89,13 +103,13 @@
       letter-spacing: 0.35em;
       text-transform: uppercase;
       color: var(--accent-dim);
-      margin: 0 0 0.6rem;
+      margin: 0 0 0.5rem;
     }
 
     h1 {
       font-family: "Cormorant Garamond", Georgia, serif;
       font-weight: 500;
-      font-size: clamp(2rem, 5vw, 3.25rem);
+      font-size: clamp(1.75rem, 5vw, 3.25rem);
       letter-spacing: 0.08em;
       margin: 0;
       color: var(--text);
@@ -104,48 +118,61 @@
     .subtitle {
       font-family: "Cormorant Garamond", Georgia, serif;
       font-style: italic;
-      font-size: clamp(1rem, 2.2vw, 1.25rem);
+      font-size: clamp(0.95rem, 2.2vw, 1.25rem);
       color: var(--text-muted);
-      margin: 0.5rem 0 0;
+      margin: 0.35rem 0 0;
     }
 
     .artists {
-      font-size: 0.75rem;
+      font-size: 0.7rem;
       letter-spacing: 0.12em;
       text-transform: uppercase;
       color: var(--accent-dim);
-      margin: 1rem 0 0;
+      margin: 0.65rem 0 0;
     }
 
-    /* Triptych wall */
     .triptych {
       position: relative;
       z-index: 1;
-      display: grid;
-      grid-template-columns: repeat(3, minmax(280px, 1fr));
-      gap: 0;
-      padding: var(--gutter) 0;
-      align-items: start;
-      justify-items: center;
-    }
-
-    .panel {
+      flex: 1;
+      min-height: 0;
+      width: 100%;
+      max-width: 100%;
       display: flex;
       flex-direction: column;
-      align-items: center;
-      width: 100%;
-      padding: 0 calc(var(--gutter) * 0.6);
-      position: relative;
+      overflow: hidden;
+      padding: var(--gutter) var(--gutter) 0;
     }
 
-    .panel::after {
+    .works {
+      flex: 1;
+      min-height: 0;
+      width: 100%;
+      max-width: 100%;
+      display: flex;
+      flex-direction: row;
+      gap: var(--work-gap);
+      overflow: hidden;
+    }
+
+    .work {
+      position: relative;
+      flex: 1 1 0;
+      min-width: 0;
+      min-height: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .work::after {
       content: "";
       position: absolute;
-      top: 0;
-      left: 50%;
-      transform: translateX(-50%);
+      inset: 0;
+      margin: auto;
       width: 70%;
-      aspect-ratio: 4 / 6;
+      aspect-ratio: var(--art-aspect);
       background: radial-gradient(ellipse at center, var(--spot) 0%, transparent 70%);
       pointer-events: none;
       z-index: 0;
@@ -154,8 +181,12 @@
     .frame-wrap {
       position: relative;
       z-index: 1;
-      width: min(100%, calc((100dvh - var(--header-h) - 9rem) * 4 / 6));
-      aspect-ratio: 4 / 6;
+      flex-shrink: 0;
+      width: var(--frame-w);
+      height: var(--frame-h);
+      aspect-ratio: var(--art-aspect);
+      max-width: 100%;
+      max-height: 100%;
       background: var(--wall-light);
       border: 1px solid var(--frame);
       box-shadow:
@@ -182,26 +213,32 @@
       display: block;
     }
 
-    .placard {
-      position: relative;
-      z-index: 1;
+    .placards {
+      flex-shrink: 0;
       width: 100%;
-      margin-top: 1.25rem;
-      padding: 0 0.25rem 1.5rem;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: var(--work-gap);
+      padding: 0.85rem 0 0.5rem;
+    }
+
+    .placard {
       text-align: center;
+      min-width: 0;
+      overflow-wrap: anywhere;
     }
 
     .placard h2 {
       font-family: "Cormorant Garamond", Georgia, serif;
       font-weight: 500;
-      font-size: 1.15rem;
+      font-size: clamp(0.85rem, 1.6vw, 1.15rem);
       letter-spacing: 0.04em;
-      margin: 0 0 0.35rem;
+      margin: 0 0 0.25rem;
       color: var(--text);
     }
 
     .placard .meta {
-      font-size: 0.7rem;
+      font-size: clamp(0.58rem, 1.2vw, 0.7rem);
       color: var(--text-muted);
       letter-spacing: 0.06em;
       margin: 0;
@@ -219,16 +256,27 @@
       border-color: var(--text);
     }
 
+    .floor-line {
+      flex-shrink: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--frame-highlight), transparent);
+      margin: 0 var(--gutter);
+      opacity: 0.5;
+    }
+
     footer {
       position: relative;
       z-index: 2;
-      padding: 1.25rem var(--gutter) 1.75rem;
+      flex-shrink: 0;
+      width: 100%;
+      padding: 0.85rem var(--gutter) calc(0.85rem + env(safe-area-inset-bottom));
       text-align: center;
       font-size: 0.65rem;
       letter-spacing: 0.1em;
       color: var(--text-muted);
       border-top: 1px solid rgba(196, 181, 154, 0.1);
       background: var(--plinth);
+      overflow-wrap: anywhere;
     }
 
     footer a {
@@ -238,21 +286,59 @@
 
     footer a:hover { color: var(--accent); }
 
-    .floor-line {
-      height: 1px;
-      background: linear-gradient(90deg, transparent, var(--frame-highlight), transparent);
-      margin: 0 var(--gutter) 0;
-      opacity: 0.5;
+    /* Portrait: stack works vertically, compact header */
+    body.portrait header {
+      padding: 0.65rem var(--gutter) 0.5rem;
     }
 
-    @media (max-width: 900px) {
-      .triptych {
-        grid-template-columns: repeat(3, minmax(72vw, 1fr));
-        overflow-x: auto;
-        scroll-snap-type: x mandatory;
-        -webkit-overflow-scrolling: touch;
-      }
-      .panel { scroll-snap-align: center; }
+    body.portrait .exhibition-label,
+    body.portrait .subtitle {
+      display: none;
+    }
+
+    body.portrait h1 {
+      font-size: clamp(1.35rem, 6vw, 2rem);
+    }
+
+    body.portrait .artists {
+      margin-top: 0.25rem;
+      font-size: 0.62rem;
+    }
+
+    body.portrait .triptych {
+      padding: 0.5rem var(--gutter) 0;
+    }
+
+    body.portrait .works {
+      flex-direction: column;
+      gap: var(--work-gap);
+    }
+
+    body.portrait .work {
+      flex: 1 1 0;
+    }
+
+    body.portrait .placards {
+      padding: 0.65rem 0 0.35rem;
+      border-top: 1px solid rgba(196, 181, 154, 0.12);
+      background: linear-gradient(180deg, transparent, rgba(14, 12, 10, 0.65));
+    }
+
+    body.portrait .placard h2 {
+      font-size: 0.78rem;
+    }
+
+    body.portrait .placard .meta {
+      font-size: 0.55rem;
+    }
+
+    body.landscape header {
+      padding-bottom: 0.5rem;
+    }
+
+    @media (max-width: 900px) and (orientation: landscape) {
+      body.landscape .exhibition-label { display: none; }
+      body.landscape .artists { margin-top: 0.35rem; }
     }
 
     @media (prefers-reduced-motion: reduce) {
@@ -260,7 +346,7 @@
     }
   </style>
 </head>
-<body>
+<body class="landscape">
   <div class="gallery">
     <header>
       <p class="exhibition-label">Generative Photography · Networked Edition</p>
@@ -270,35 +356,38 @@
     </header>
 
     <main class="triptych" aria-label="Three-panel artwork installation">
-      <article class="panel">
-        <div class="frame-wrap">
-          <iframe class="artwork" title="CONTINGENT #94" loading="eager" referrerpolicy="no-referrer" sandbox="allow-scripts allow-same-origin allow-downloads" data-token-hash="SNwLkwc34iAxtJ2DQozttCypjy4AF7kye"></iframe>
-        </div>
+      <div class="works">
+        <article class="work">
+          <div class="frame-wrap">
+            <iframe class="artwork" title="CONTINGENT #94" loading="eager" referrerpolicy="no-referrer" sandbox="allow-scripts allow-same-origin allow-downloads" data-token-hash="SNwLkwc34iAxtJ2DQozttCypjy4AF7kye"></iframe>
+          </div>
+        </article>
+        <article class="work">
+          <div class="frame-wrap">
+            <iframe class="artwork" title="CONTINGENT #83" loading="eager" referrerpolicy="no-referrer" sandbox="allow-scripts allow-same-origin allow-downloads" data-token-hash="3eTwWM92SEmmiLNFEgVgus13VSHKWZJw2"></iframe>
+          </div>
+        </article>
+        <article class="work">
+          <div class="frame-wrap">
+            <iframe class="artwork" title="CONTINGENT #143" loading="eager" referrerpolicy="no-referrer" sandbox="allow-scripts allow-same-origin allow-downloads" data-token-hash="CbfUEHV9hHYvZTXDdnCsh4HYQbyGQC8bN"></iframe>
+          </div>
+        </article>
+      </div>
+
+      <div class="placards" aria-label="Artwork labels">
         <div class="placard">
           <h2>CONTINGENT #94</h2>
           <p class="meta">Token 95 · <a href="https://objkt.com/tokens/KT1UAS5N32uiAeQjXjfwkkwh7NUHPQapzLNs/95" target="_blank" rel="noopener">View on OBJKT</a></p>
-        </div>
-      </article>
-
-      <article class="panel">
-        <div class="frame-wrap">
-          <iframe class="artwork" title="CONTINGENT #83" loading="eager" referrerpolicy="no-referrer" sandbox="allow-scripts allow-same-origin allow-downloads" data-token-hash="3eTwWM92SEmmiLNFEgVgus13VSHKWZJw2"></iframe>
         </div>
         <div class="placard">
           <h2>CONTINGENT #83</h2>
           <p class="meta">Token 84 · <a href="https://objkt.com/tokens/KT1UAS5N32uiAeQjXjfwkkwh7NUHPQapzLNs/84" target="_blank" rel="noopener">View on OBJKT</a></p>
         </div>
-      </article>
-
-      <article class="panel">
-        <div class="frame-wrap">
-          <iframe class="artwork" title="CONTINGENT #143" loading="eager" referrerpolicy="no-referrer" sandbox="allow-scripts allow-same-origin allow-downloads" data-token-hash="CbfUEHV9hHYvZTXDdnCsh4HYQbyGQC8bN"></iframe>
-        </div>
         <div class="placard">
           <h2>CONTINGENT #143</h2>
           <p class="meta">Token 144 · <a href="https://objkt.com/tokens/KT1UAS5N32uiAeQjXjfwkkwh7NUHPQapzLNs/144" target="_blank" rel="noopener">View on OBJKT</a></p>
         </div>
-      </article>
+      </div>
     </main>
 
     <div class="floor-line" aria-hidden="true"></div>
@@ -317,6 +406,7 @@
     const LOCKED_TIMEZONE = "Asia/Macau";
     const ARTIFACT_CID = "bafybeiang4nlnz6t3yh4c52ffjbd3nqzjlns5bv333mom7kyzmti5hdmem";
     const GATEWAY = "https://ipfs.io/ipfs";
+    const ART_ASPECT = 4 / 6;
 
     function artworkUrl(tokenHash) {
       const params = new URLSearchParams({
@@ -331,8 +421,68 @@
       frame.src = artworkUrl(frame.dataset.tokenHash);
     }
 
-    const tzNote = document.getElementById("timezone-lock");
-    if (tzNote) tzNote.textContent = LOCKED_TIMEZONE;
+    document.getElementById("timezone-lock").textContent = LOCKED_TIMEZONE;
+
+    function isPortraitLayout() {
+      return window.matchMedia("(orientation: portrait)").matches;
+    }
+
+    function setLayoutMode() {
+      const portrait = isPortraitLayout();
+      document.body.classList.toggle("portrait", portrait);
+      document.body.classList.toggle("landscape", !portrait);
+    }
+
+    function layoutFrames() {
+      const root = document.documentElement;
+      const works = document.querySelector(".works");
+      if (!works) return;
+
+      const gap = parseFloat(getComputedStyle(works).gap) || 0;
+      const areaW = works.clientWidth;
+      const areaH = works.clientHeight;
+      if (areaW <= 0 || areaH <= 0) return;
+
+      let frameW;
+      let frameH;
+
+      if (document.body.classList.contains("portrait")) {
+        const maxH = (areaH - gap * 2) / 3;
+        frameH = maxH;
+        frameW = frameH * ART_ASPECT;
+        if (frameW > areaW) {
+          frameW = areaW;
+          frameH = frameW / ART_ASPECT;
+        }
+      } else {
+        const maxW = (areaW - gap * 2) / 3;
+        frameW = maxW;
+        frameH = frameW / ART_ASPECT;
+        if (frameH > areaH) {
+          frameH = areaH;
+          frameW = frameH * ART_ASPECT;
+        }
+      }
+
+      root.style.setProperty("--frame-w", `${Math.floor(frameW)}px`);
+      root.style.setProperty("--frame-h", `${Math.floor(frameH)}px`);
+    }
+
+    function refreshLayout() {
+      setLayoutMode();
+      requestAnimationFrame(layoutFrames);
+    }
+
+    window.matchMedia("(orientation: portrait)").addEventListener("change", refreshLayout);
+    window.addEventListener("resize", refreshLayout);
+    window.addEventListener("load", refreshLayout);
+
+    const worksEl = document.querySelector(".works");
+    if (worksEl && "ResizeObserver" in window) {
+      new ResizeObserver(refreshLayout).observe(worksEl);
+    }
+
+    refreshLayout();
   </script>
 </body>
 </html>
