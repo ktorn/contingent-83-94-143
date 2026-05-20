@@ -2,6 +2,8 @@
 
 A museum-style web installation presenting three [CONTINGENT](https://objkt.com/collections/KT1UAS5N32uiAeQjXjfwkkwh7NUHPQapzLNs) generative artworks side by side.
 
+**Live:** https://ktorn.github.io/contingent-83-94-143/
+
 | Panel | OBJKT | Edition |
 |-------|-------|---------|
 | Left | [Token 95](https://objkt.com/tokens/KT1UAS5N32uiAeQjXjfwkkwh7NUHPQapzLNs/95) | CONTINGENT #94 |
@@ -13,7 +15,7 @@ Each piece loads from IPFS in its own iframe so all three Three.js scenes run co
 ## Run locally
 
 ```bash
-cd contingent-triptych
+cd contingent-83-94-143
 python3 -m http.server 8080
 ```
 
